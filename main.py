@@ -44,5 +44,4 @@ logger.info(site_name)
 base = "mybd.db"
 
 
-#wtdb.write_to_db(dict, base)
-fdff
+wtdb.write_to_db(dict, base)
