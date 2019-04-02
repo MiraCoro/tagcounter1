@@ -2,8 +2,9 @@ import datetime
 from bs4 import BeautifulSoup
 import requests
 import logging
-import  pickle
-import sqlite3
+import wtdb
+
+
 html_page = input("Please specify a site name: \n")
 #html_page = requests.get(page)
 tag_count = 0
@@ -40,20 +41,7 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 logger.info(site_name)
-
-#with open('file.pickle', 'wb') as f:
-#    bdict = pickle.dump(dict, f)
+base = "mybd.db"
 
 
-bdict = pickle.dumps(dict)
-
-conn = sqlite3.connect("mybd.db")
-cursor = conn.cursor()
-#cursor.execute('''CREATE TABLE Tags_of_sites
-#                  (site_name text, url text, date text, tags blob)''')
-
-cursor.execute('''INSERT INTO Tags_of_sites VALUES (?, ?, ?, ?)''', (site_name, html_page, current_date, bdict))
-
-#cursor.execute('INSERT INTO Tag_of_sites VALUES (?, ?)', (id, pickle.dumps(dict)))
-conn.commit()
-conn.close()
+wtdb.write_to_db(dict, base)
