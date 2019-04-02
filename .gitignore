@@ -4,9 +4,9 @@
 
 # IntelliJ project files
 .idea
+venv
 *.iml
 out
 gen
 
-.idea/
-venv/
+
