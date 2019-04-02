@@ -1,9 +1,10 @@
 import datetime
 from bs4 import BeautifulSoup
 import requests
-from collections import Counter
-import re
-#html_page = 'https://google.com'
+import logging
+import  pickle
+import sqlite3
+
 html_page = input("Please specify a site name: \n")
 #html_page = requests.get(page)
 tag_count = 0
@@ -26,3 +27,30 @@ print (site_name)
 
 current_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
 print(current_date)
+
+logger = logging.getLogger("tagcounter")
+logger.setLevel(logging.INFO)
+
+# create the logging file handler
+fh = logging.FileHandler("tagcounter.log")
+
+formatter = logging.Formatter('%(asctime)s - %(message)s')
+fh.setFormatter(formatter)
+
+# add handler to logger object
+logger.addHandler(fh)
+
+logger.info(site_name)
+
+bdict = pickle.dumps(dict)
+
+conn = sqlite3.connect("mybd.db")
+cursor = conn.cursor()
+#cursor.execute('''CREATE TABLE Tags_of_sites
+#                  (site_name text, url text, date text, tags blob)''')
+
+cursor.execute('''INSERT INTO Tags_of_sites VALUES (?, ?, ?, ?)''', (site_name, html_page, current_date, bdict))
+
+#cursor.execute('INSERT INTO Tag_of_sites VALUES (?, ?)', (id, pickle.dumps(dict)))
+conn.commit()
+conn.close()
