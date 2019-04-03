@@ -1,0 +1,6 @@
+yandex: https://yandex.ru
+google: https://google.com
+vk: https://vk.com
+bbc: https://bbc.com
+rambler: https://rambler.ru
+facebook: https://facebook.com

@@ -4,9 +4,11 @@
 
 # IntelliJ project files
 .idea
-venv
+venv/
 *.iml
 out
 gen
 tagcounter.log
+shpargalka.py
+задание.txt
 
