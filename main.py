@@ -25,13 +25,13 @@ def tagcounter(html_page):
             dict.update({tag: tag_count})
         else:
             dict[tag] = tag_count
-    print(dict)
+    #print(dict)
     list = [x for x, y in dict.items()]
 
     bdict = pickle.dumps(dict)
 
     site_name = (soup.find('title')).contents[0]
-    print(site_name)
+    #print(site_name)
 
     conn = sqlite3.connect(base)
     cursor = conn.cursor()
@@ -59,8 +59,8 @@ def tagcounter(html_page):
     logger.info(site_name)
     return list
 
-list_of_tags = tagcounter('https://bbc.com')
-print(list_of_tags)
+#list_of_tags = tagcounter('https://bbc.com')
+#print(list_of_tags)
 
 root = Tk()
 List_of_sites = Listbox(root, selectbackground='blue', selectforeground='yellow', text="List of sites", selectmode=SINGLE)
@@ -78,6 +78,8 @@ List_of_sites.pack(side=LEFT, fill=BOTH, expand=1)
 Select_button = Button(root, text="Select a site", command=lambda: tagcounter(List_of_sites.get(ACTIVE)))
 Select_button.pack()
 
+'''
+
 list_of_synonyms = Listbox(root, selectbackground='blue', selectforeground='yellow', text="List of synonyms ", selectmode=SINGLE)
 
 for syn in config:
@@ -88,13 +90,15 @@ for syn in config:
 
 list_of_synonyms.pack(side=RIGHT, fill=BOTH, expand=1)
 
-Delete_button = Button(root, command=lambda list_of_synonyms=list_of_synonyms: list_of_synonyms.delete(ACTIVE), text="Delete a site from synonyms's list")
+'''
+
+Delete_button = Button(root, command=lambda List_of_sites=List_of_sites: List_of_sites.delete(ACTIVE), text="Delete a site from list")
 Delete_button.pack(side=RIGHT)
 
 config = open('synonyms.yml', 'a')
 v = StringVar().set(input("Please specify synonym and site name: \n"))
-Enter_syn_site = Entry(root, width=20, textvariable=v)
-Enter_syn_site.pack()
+#Enter_syn_site = Entry(root, width=20, textvariable=v)
+#Enter_syn_site.pack()
 Add_button = Button(root, text="Add a site to synonyms's list", command=config.write(v))
 Add_button.pack(side=LEFT)
 
