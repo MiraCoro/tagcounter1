@@ -17,3 +17,11 @@ List_of_sites.pack(side=LEFT, fill=BOTH, expand=1)
 Select_button = Button(root, text="Select a site", command=lambda tagcounter(Site))
 Select_button.pack()
 root.mainloop()
+
+import sys
+
+if __name__ == "__main__":
+    if len (sys.argv) > 1:
+        print ("Привет, {}!".format (sys.argv[1] ) )
+    else:
+        print ("Привет, мир!")
