@@ -8,7 +8,6 @@ def get_tage_from_base(url):
     conn.close()
 
 
-
 a = 'https://mail.ru'
 get_tage_from_base(a)
 

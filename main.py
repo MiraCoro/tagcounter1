@@ -13,24 +13,6 @@ base = "mybd.db"
 
 # html_page = input("Please specify a site name: \n")
 # html_page = requests.get(page)
-
-
-#list_of_tags = tagcounter('https://bbc.com')
-#print(list_of_tags)
-
-root = Tk()
-List_of_sites = Listbox(root, selectbackground='blue', selectforeground='yellow', selectmode=SINGLE)
-
-with open('synonyms.yml', 'r') as config:
-    for site in config:
-        line = config.readline()
-        line = re.search("https://.+", line).group(0)
-    #print (line.group(0))
-        List_of_sites.insert(END, line)
-
-
-List_of_sites.pack(side=LEFT, fill=BOTH, expand=1)
-
 def tagcounter(html_page):
     tag_count = 0
     dict = {}
@@ -44,13 +26,11 @@ def tagcounter(html_page):
             dict.update({tag: tag_count})
         else:
             dict[tag] = tag_count
-    #print(dict)
+
     list = [x for x, y in dict.items()]
 
     bdict = pickle.dumps(dict)
-
     site_name = (soup.find('title')).contents[0]
-    #print(site_name)
 
     conn = sqlite3.connect(base)
     cursor = conn.cursor()
@@ -79,58 +59,59 @@ def tagcounter(html_page):
     return list
 
 
-Select_button = Button(root, text="Select a site", command=lambda: tagcounter(List_of_sites.get(ACTIVE)))
-Select_button.pack()
+root = Tk()
+List_of_sites = Listbox(root, selectbackground='blue', selectforeground='yellow', selectmode=SINGLE)
+List_of_sites.pack(side=LEFT, fill=BOTH, expand=1)
 
-config = open('synonyms.yml', 'a')
-#v1 = StringVar().set(input("Please specify synonym and site name: \n"))
-#v = StringVar().get
-v = str(input("Please specify synonym and site name: \n"))
-print(v)
+with open('synonyms.yml', 'r') as config:
+    for site in config:
+        line = config.readline()
+        line = re.search("https://.+", line).group(0)
+    #print (line.group(0))
+        List_of_sites.insert(END, line)
 
-Add_button = Button(root, text="Add a site to synonyms's list", command=config.write(v))
-Add_button.pack(side=LEFT)
 Delete_button = Button(root, command=lambda List_of_sites=List_of_sites: List_of_sites.delete(ACTIVE), text="Delete a site from list")
-Delete_button.pack(side=RIGHT)
-'''
+Delete_button.pack(side=LEFT)
 
-list_of_synonyms = Listbox(root, selectbackground='blue', selectforeground='yellow', text="List of synonyms ", selectmode=SINGLE)
-
-for syn in config:
-    line = config.readline()
-    list_of_synonyms.insert(END, line)
-
-
-
-list_of_synonyms.pack(side=RIGHT, fill=BOTH, expand=1)
-
-'''
-Enter_syn_site = Entry(root, width=20, textvariable=v)
-Enter_syn_site.pack()
-#Enter_syn_site = Entry(root, width=20, textvariable=v)
-#Enter_syn_site.pack()
-
-#w = StringVar().set(input("Please specify a site name: \n"))
 w = str(input("Please specify a site name: \n"))
 Enter_site = Entry(root, width=20, textvariable=w)
-Enter_site.pack()
-
+Enter_site.pack(side=LEFT)
 
 Get_tags_button = Button(root, text="Get tags", command=tagcounter(w))
-Get_tags_button.pack(side=RIGHT)
+Get_tags_button.pack(side=LEFT)
 
-Show_from_db_button = Button(root, text="Show tags from database", command=get_tage_from_base(v)) #запрос и раскодирование
+Show_from_db_button = Button(root, text="Show tags from database", command=get_tage_from_base(List_of_sites.get(ACTIVE))) #запрос и раскодирование
 Show_from_db_button.pack(side=RIGHT)
 
+v = str(input("Please specify synonym and site name: \n"))
+Enter_syn_site = Entry(root, width=20, textvariable=v)
+Enter_syn_site.pack(side=RIGHT)
 
+syn_sites = open('synonyms.yml', 'a')
 
+Add_button = Button(root, text="Add a site to synonyms's list", command=syn_sites.write(v))
+Add_button.pack(side=RIGHT)
 
 Tags = Label(root, bg='black', fg='white', width=60)
 Tags.pack()
 
 Status = Label(root, bg='white', fg='green', width=60)
 Status.pack()
-config.close()
+
+'''
+Select_button = Button(root, text="Select a site", command=lambda: tagcounter(List_of_sites.get(ACTIVE)))
+Select_button.pack()
+list_of_synonyms = Listbox(root, selectbackground='blue', selectforeground='yellow', text="List of synonyms ", selectmode=SINGLE)
+
+for syn in config:
+    line = config.readline()
+    list_of_synonyms.insert(END, line)
+
+list_of_synonyms.pack(side=RIGHT, fill=BOTH, expand=1)
+
+'''
+syn_sites.close()
+root.after(5000, tagcounter)
 root.mainloop()
 
 
