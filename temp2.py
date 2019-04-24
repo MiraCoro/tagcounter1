@@ -21,12 +21,14 @@ def tagcounter(html_page):
             dict.update({tag: tag_count})
         else:
             dict[tag] = tag_count
-    #print(dict)
+    print(dict)
     list = [x for x, y in dict.items()]
 
     bdict = pickle.dumps(dict)
-    '''
     print(bdict)
+    print(pickle.loads(bdict))
+    '''
+    
     print(type(bdict))
     z = pickle.loads(bdict)
     print(z)
