@@ -5,6 +5,7 @@ import logging
 import pickle
 import sqlite3
 current_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
+print(current_date)
 base = "mybd.db"
 
 def tagcounter(html_page):
@@ -20,19 +21,18 @@ def tagcounter(html_page):
             dict.update({tag: tag_count})
         else:
             dict[tag] = tag_count
-    print(dict)
+    #print(dict)
     list = [x for x, y in dict.items()]
 
     bdict = pickle.dumps(dict)
+    '''
     print(bdict)
     print(type(bdict))
     z = pickle.loads(bdict)
     print(z)
     print(type(z))
-
-
-
-
+'''
+    print(html_page)
     site_name = (soup.find('title')).contents[0]
     #print(site_name)
 
@@ -62,5 +62,5 @@ def tagcounter(html_page):
     logger.info(site_name)
     return list
 
-x = 'https://mail.ru'
+x = 'https://python-scripts.com/'
 tagcounter(x)
