@@ -66,11 +66,14 @@ def tagcounter(event):
     if dict:
         Status['text'] = 'Success'
     else:
-        Status['text'] ='Somthing went wrong'
+        Status['text'] ='Something went wrong'
     return list
 
 def get_tage_from_base(event):
-    url = html_page = List_of_sites.get(ACTIVE)
+    if List_of_sites.get(ACTIVE) and not Enter_site.get():
+        url = List_of_sites.get(ACTIVE)
+    else:
+        url = Enter_site.get()
     import sqlite3
     import pickle
     conn = sqlite3.connect("mybd.db")
@@ -82,17 +85,22 @@ def get_tage_from_base(event):
 
 root = Tk()
 
-
 List_of_sites = Listbox(root, selectbackground='black', selectforeground='red', selectmode=SINGLE)
 List_of_sites.pack(side=TOP, fill=BOTH, expand=1)
 
-with open('synonyms.yml', 'r') as config:
+with open('synonyms.yml', 'a+') as config:
+    config.seek(0)
     for line in config.readlines():
         line = re.search("https://.+", line).group(0)
     #print (line.group(0))
         List_of_sites.insert(END, line)
-Select_button = Button(root, text="Select a site", command=lambda: tagcounter)
+
+
+
+Select_button = Button(root, text="Select a site")
 Select_button.pack(side=TOP)
+Select_button.bind('<Button-1>', tagcounter)
+
 
 Enter_site = Entry(root, width=20)
 Enter_site.pack(side=TOP)
@@ -112,27 +120,39 @@ Status.pack(side=BOTTOM)
 
 Tags = Label(root, bg='black', fg='white', width=60)
 Tags.pack(expand=1, fill=BOTH, side=BOTTOM)
-syn_sites = open ('synonyms.yml', 'a')
 
-Delete_button = Button(root, command=lambda syn_sites=syn_sites: syn_sites.delete(ACTIVE), text="Delete a site from list")
+def add_to_syn(ss):
+    line = Enter_site.get()
+    url = re.search("http*://",line)
+    synonym = re.search('^\w+', line)
+    split = re.search(': ', line)
+    if synonym and url and split:
+        config.write(line)
+        list_of_synonyms.insert(END, line)
+    else:
+        Status['text'] = "Incorrect input. Please specify synonym and url (e.g. google: https://google.com)"
+
+
+list_of_synonyms = Listbox(root, selectbackground='yellow', selectforeground='green', selectmode=SINGLE)
+list_of_synonyms.pack(side=BOTTOM)
+
+with open('synonyms.yml', 'a+') as config:
+    config.seek(0)
+    for syn in config:
+        line = config.readline()
+        list_of_synonyms.insert(END, line)
+
+
+Delete_button = Button(root, command=lambda list_of_synonyms=list_of_synonyms: list_of_synonyms.delete(ACTIVE), text="Delete a site from list")
 Delete_button.pack(side=BOTTOM)
 
 Add_button = Button(root, text="Add a site to synonyms's list")
-Add_button.bind('<Button-1>', lambda syn_sites=syn_sites: syn_sites.write(Enter_site.get()))
+Add_button.bind('<Button-1>', add_to_syn)
 Add_button.pack(side=BOTTOM)
 
 #lambda List_of_sites=List_of_sites: List_of_sites.delete(ACTIVE)
 Enter_syn_site = Entry(root, width=20)
 Enter_syn_site.pack(side=BOTTOM)
-
-list_of_synonyms = Listbox(root, selectbackground='yellow', selectforeground='green', selectmode=SINGLE)
-list_of_synonyms.pack(side=BOTTOM)
-with open ('synonyms.yml', 'r') as syn_sites:
-    for line in syn_sites.readlines():
-        list_of_synonyms.insert(END, line)
-
-
-
 
 root.after(5000, tagcounter)
 root.mainloop()
@@ -142,11 +162,8 @@ Select_button = Button(root, text="Select a site", command=lambda: tagcounter(Li
 Select_button.pack()
 list_of_synonyms = Listbox(root, selectbackground='blue', selectforeground='yellow', text="List of synonyms ", selectmode=SINGLE)
 
-for syn in config:
-    line = config.readline()
-    list_of_synonyms.insert(END, line)
+
 
 list_of_synonyms.pack(side=RIGHT, fill=BOTH, expand=1)
 
 '''
-syn_sites.close()
