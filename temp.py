@@ -1,13 +1,22 @@
-def get_tage_from_base(url):
-    import sqlite3
-    import pickle
-    conn = sqlite3.connect("mybd.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT tags FROM Tags_of_sites WHERE url = ?",  (url,))
-    print(pickle.loads(cursor.fetchone()[0]))
-    conn.close()
+from tkinter import *
+
+root = Tk()
+
+e = Entry(width=20)
+b = Button(text="Преобразовать")
+l = Label(bg='black', fg='white', width=20)
 
 
-a = 'https://mail.ru'
-get_tage_from_base(a)
+def strToSortlist(event):
+    s = e.get()
+    s = s.split()
+    s.sort()
+    l['text'] = ' '.join(s)
 
+
+b.bind('<Button-1>', strToSortlist)
+
+e.pack()
+b.pack()
+l.pack()
+root.mainloop()
