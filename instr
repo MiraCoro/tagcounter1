@@ -1,0 +1,9 @@
+ssh -T git@github.com
+git init
+git pull git@github.com:MiraCoro/tagcounter.git
+
+.idea
+venv
+
+
+

@@ -8,7 +8,6 @@ venv/
 *.iml
 out
 gen
-shpargalka.py
-задание.txt
 
 __pycache__/
+
