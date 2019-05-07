@@ -6,7 +6,6 @@ import pickle
 import sqlite3
 from tkinter import *
 import re
-#from temp import get_tage_from_base
 
 current_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
 base = "mybd.db"
@@ -14,12 +13,25 @@ base = "mybd.db"
 # html_page = input("Please specify a site name: \n")
 # html_page = requests.get(page)
 def tagcounter(event):
-    if List_of_sites.get(ACTIVE) and not Enter_site.get():
-        html_page = List_of_sites.get(ACTIVE)
-    else:
+    if Enter_site.get():
         html_page = Enter_site.get()
-    #html_page = Enter_site.get()
-    #print(html_page)
+        Enter_site.delete(0, END)
+    else:
+        html_page = List_of_sites.get(ACTIVE)
+
+    if (html_page == re.search("\w", html_page)):
+        for string in open('synonyms.yml').readlines():
+            if html_page in string:
+                html_page = re.search("https://.+", string).group(0)
+            else:
+                Status['text'] = "Unknown synonym"
+
+
+
+    #if html_page = re.search("http*://",line):
+
+
+
     tag_count = 0
     dict = {}
     soup = BeautifulSoup(requests.get(html_page).content, 'html.parser')
@@ -34,7 +46,7 @@ def tagcounter(event):
             dict[tag] = tag_count
 
     Tags['text'] = dict
-    list = [x for x, y in dict.items()]
+    #list = [x for x, y in dict.items()]
 
     bdict = pickle.dumps(dict)
     site_name = (soup.find('title')).contents[0]
@@ -63,17 +75,18 @@ def tagcounter(event):
     logger.addHandler(fh)
 
     logger.info(site_name)
-    if dict:
+    if any(dict):
         Status['text'] = 'Success'
     else:
         Status['text'] ='Something went wrong'
     return list
 
 def get_tage_from_base(event):
-    if List_of_sites.get(ACTIVE) and not Enter_site.get():
-        url = List_of_sites.get(ACTIVE)
-    else:
+    if Enter_site.get():
         url = Enter_site.get()
+        Enter_site.delete(0, END)
+    else:
+        url = List_of_sites.get(ACTIVE)
     import sqlite3
     import pickle
     conn = sqlite3.connect("mybd.db")
@@ -85,8 +98,15 @@ def get_tage_from_base(event):
 
 root = Tk()
 
-List_of_sites = Listbox(root, selectbackground='black', selectforeground='red', selectmode=SINGLE)
+frame = Frame(root)
+scroll_sites = Scrollbar(frame, orient=VERTICAL)
+List_of_sites = Listbox(frame, yscrollcommand=scroll_sites.set, selectbackground='black', selectforeground='red', selectmode=BROWSE)
+scroll_sites.config(command=List_of_sites.yview)
+scroll_sites.pack(side=RIGHT,fill=Y)
 List_of_sites.pack(side=TOP, fill=BOTH, expand=1)
+List_of_sites.bind('<Double-Button-1>', tagcounter)
+List_of_sites.bind('<FocusOut>', lambda e: List_of_sites.selection_clear(0, END))
+frame.pack()
 
 with open('synonyms.yml', 'a+') as config:
     config.seek(0)
@@ -94,13 +114,6 @@ with open('synonyms.yml', 'a+') as config:
         line = re.search("https://.+", line).group(0)
     #print (line.group(0))
         List_of_sites.insert(END, line)
-
-
-
-Select_button = Button(root, text="Select a site")
-Select_button.pack(side=TOP)
-Select_button.bind('<Button-1>', tagcounter)
-
 
 Enter_site = Entry(root, width=20)
 Enter_site.pack(side=TOP)
@@ -118,8 +131,9 @@ Show_from_db_button.pack(side=TOP)
 Status = Label(root, bg='white', fg='green', width=60)
 Status.pack(side=BOTTOM)
 
-Tags = Label(root, bg='black', fg='white', width=60)
-Tags.pack(expand=1, fill=BOTH, side=BOTTOM)
+Tags = Label(root, bg='black', fg='white')
+Tags.config(wraplength=500, anchor=NW, justify=CENTER)
+Tags.pack(fill=BOTH, expand=1, side=BOTTOM)
 
 def add_to_syn(ss):
     line = Enter_site.get()
@@ -150,7 +164,6 @@ Add_button = Button(root, text="Add a site to synonyms's list")
 Add_button.bind('<Button-1>', add_to_syn)
 Add_button.pack(side=BOTTOM)
 
-#lambda List_of_sites=List_of_sites: List_of_sites.delete(ACTIVE)
 Enter_syn_site = Entry(root, width=20)
 Enter_syn_site.pack(side=BOTTOM)
 
