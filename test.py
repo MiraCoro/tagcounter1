@@ -6,6 +6,7 @@ import pickle
 import sqlite3
 from tkinter import *
 import re
+import httplib2
 
 current_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
 base = "mybd.db"
@@ -13,25 +14,7 @@ base = "mybd.db"
 # html_page = input("Please specify a site name: \n")
 # html_page = requests.get(page)
 def tagcounter(event):
-    if Enter_site.get():
-        html_page = Enter_site.get()
-        Enter_site.delete(0, END)
-    else:
-        html_page = List_of_sites.get(ACTIVE)
-
-    if (html_page == re.search("\w", html_page)):
-        for string in open('synonyms.yml').readlines():
-            if html_page in string:
-                html_page = re.search("https://.+", string).group(0)
-            else:
-                Status['text'] = "Unknown synonym"
-
-
-
-    #if html_page = re.search("http*://",line):
-
-
-
+    html_page = check_user_enter()
     tag_count = 0
     dict = {}
     soup = BeautifulSoup(requests.get(html_page).content, 'html.parser')
@@ -95,6 +78,41 @@ def get_tage_from_base(event):
     tags = pickle.loads(cursor.fetchone()[0])
     conn.close()
     Tags['text'] = tags
+
+def check_user_enter():
+    if Enter_site.get():
+        url = Enter_site.get()
+        Enter_site.delete(0, END)
+
+        #Check if url is correct
+        if not re.match("http(s)*://.+", url):
+            h = httplib2.Http()
+            resp = h.request("http://www.google.com", 'HEAD')
+            #If url correct (several literals with point between) and protocol doesn't specified - add protocol
+            if re.search("\w+.\w{2,}", url):
+                url = 'https://' + url
+            #If url contains only one word, check is it synonym, was it correct written and it exists in synonyms list
+            elif re.search("\w+", url):
+
+                with open ('synonyms.yml', 'r') as doc:
+                    doc.seek(0)
+                    for string in doc.readlines():
+                        if url in string:
+                            url = re.search("https://.+", string).group(0)
+                            break
+                        else:
+                            Tags['text'] = ''
+                            Status['text'] = "Synonym's url not found. Try again"
+            else:
+                Tags['text'] = ''
+                Status['text'] = "Incorrect input: url or synonym not found"
+
+    else:
+        Tags['text'] = ''
+        url = List_of_sites.get(ACTIVE)
+    return url
+
+
 
 root = Tk()
 
