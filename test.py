@@ -83,14 +83,17 @@ def check_user_enter():
     if Enter_site.get():
         url = Enter_site.get()
         Enter_site.delete(0, END)
-
         #Check if url is correct
         if not re.match("http(s)*://.+", url):
-            h = httplib2.Http()
-            resp = h.request("http://www.google.com", 'HEAD')
             #If url correct (several literals with point between) and protocol doesn't specified - add protocol
             if re.search("\w+.\w{2,}", url):
                 url = 'https://' + url
+                h = httplib2.Http()
+                resp = h.request(url, 'HEAD')
+                if not any(resp):
+                    Status['text'] = "Incorrect input: url is invalid. Try again"
+                    Tags['text'] = ''
+
             #If url contains only one word, check is it synonym, was it correct written and it exists in synonyms list
             elif re.search("\w+", url):
 

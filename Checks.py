@@ -1,34 +1,38 @@
 import httplib2
 import re
-#h = httplib2.Http()
-#resp = h.request("http://www.google.com", 'HEAD')
-#print(resp)
+def check_user_enter(x):
+    if not re.match("https://.+|https://.+", x):
+         #If url correct (several literals with point between) and protocol doesn't specified - add protocol
+        if re.search("\w+.\w{2,}", x):
+            url = 'https://' + x
+            h = httplib2.Http()
+            resp = h.request(url, 'HEAD')
+            if not any(resp):
+                print("Incorrect input: url is invalid. Try again")
+            else:
+                print("Url + https")
 
-def check_user_enter(url):
-    h = httplib2.Http()
-   #Check if url is correct
-    if not re.match("http(s)*://.+", url):
-        # If url correct (several literals with point between) and protocol doesn't specified - add protocol
-        if re.search("\b\w+\.\w{2,}", url):
-            url = 'https://' + url
+
             #If url contains only one word, check is it synonym, was it correct written and it exists in synonyms list
-        elif re.search("\b\w+", url):
-
+        elif re.search("\w+", x):
             with open ('synonyms.yml', 'r') as doc:
                 doc.seek(0)
                 for string in doc.readlines():
-                    if url in string:
+                    if x in string:
                         url = re.search("https://.+", string).group(0)
+                        print("Synonym found")
                         break
                     else:
-                    print("Synonym's url not found. Try again")
-            else:
-                Tags['text'] = ''
-                Status['text'] = "Incorrect input: url or synonym not found"
-
-    else:
-        if any(resp):
-            print(url)
+                        print("Synonym's url not found. Try again")
         else:
-            print("Url not found")
+            print("Not a site")
+    else:
+        url = x
+        print("Url is valid")
+
     return url
+
+#y = 'https://effbot.org/'
+y='yandx.ru'
+
+check_user_enter(y)
